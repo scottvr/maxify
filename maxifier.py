@@ -61,6 +61,7 @@ def extract_sourcemap(js_content):
     except Exception as e:
         return None, f"Failed to fetch sourcemap from URL: {e}"
 
+sourcemap = None
 if args.auto_map:
     js_url = args.auto_map
     log(f"Retrieving JavaScript file from: {js_url}")
