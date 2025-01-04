@@ -3,6 +3,7 @@ import re
 import json
 import argparse
 import requests
+import base64
 from urllib.parse import urljoin, urlparse
 
 # Argument parser setup
@@ -32,6 +33,34 @@ def resolve_sourcemap_url(js_url, sourcemap_path):
     else:  # Relative URL
         return urljoin(js_url, sourcemap_path)
 
+def extract_sourcemap(js_content):
+    # Regex for sourceMappingURL
+    pattern = r"//# sourceMappingURL=(.+)"
+    match = re.search(pattern, js_content)
+    
+    if not match:
+        return None, "No sourceMappingURL found in the JavaScript file and no X-SourceMap header present.\nIf you have the sourcemap file, try running with that files as the sourcemap argument, without --auto_map"
+    
+    sourcemap_url = match.group(1)
+
+    # Check for data URL
+    if sourcemap_url.startswith("data:application/json;base64,"):
+        # Decode Base64
+        base64_data = sourcemap_url[len("data:application/json;base64,"):]
+        try:
+            decoded = base64.b64decode(base64_data).decode('utf-8')
+            return json.loads(decoded), None
+        except Exception as e:
+            return None, f"Failed to decode Base64 data: {e}"
+
+    # Fallback for external URLs
+    try:
+        response = requests.get(sourcemap_url)
+        response.raise_for_status()
+        return response.json(), None
+    except Exception as e:
+        return None, f"Failed to fetch sourcemap from URL: {e}"
+
 if args.auto_map:
     js_url = args.auto_map
     log(f"Retrieving JavaScript file from: {js_url}")
@@ -52,29 +81,14 @@ if args.auto_map:
     else:
         # If no header, search for sourceMappingURL in the file content
         log("No X-SourceMap header found. Searching for //# sourceMappingURL in the file...")
-        pattern = r"//# sourceMappingURL=([\w\-.\/]+)"
-        match = re.search(pattern, js_content)
-        if match:
-            sourcemap_path = match.group(1)
-            log(f"Found sourceMappingURL in file: {sourcemap_path}")
-            sourcemap_url = resolve_sourcemap_url(js_url, sourcemap_path)
+        sourcemap, error = extract_sourcemap(js_content)
+        if error:
+            log(f"Error: {error}")
         else:
-            print("No sourceMappingURL found in the JavaScript file and no X-SourceMap header present.\nIf you have the sourcemap file, try running with that files as the sourcemap argument, without --auto_map")
-            exit(1)
+            log("Extracted Sourcemap:")
+            log(json.dumps(sourcemap, indent=4))
 
-    try:
-        log(f"Retrieving sourcemap from: {sourcemap_url}")
-        response = requests.get(sourcemap_url)
-        response.raise_for_status()
-        sourcemap = response.json()
-    except requests.RequestException as e:
-        print(f"Error fetching sourcemap file: {e}")
-        exit(1)
-    except json.JSONDecodeError as e:
-        print(f"Error decoding sourcemap JSON: {e}")
-        exit(1)
-
-else:
+  if not sourcemap:
     # Fallback to local file
     sourcemap = json.load(args.sourcemap)
 
