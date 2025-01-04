@@ -6,7 +6,14 @@ import requests
 from urllib.parse import urljoin, urlparse
 
 # Argument parser setup
-parser = argparse.ArgumentParser(description="Recreate unminified source paths on disk from (json) .map file", epilog="Examples:\n%(prog)s path/to/source.js.map -o ./output_dir\n\nor\n\n%(prog)s --auto_map https://example.com/scripts/main.js -o ./output -v")
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, 
+                                 description="Recreate unminified source paths on disk from (json) .map file", 
+                                 epilog='''Examples:
+%(prog)s path/to/source.js.map -o ./output_dir
+
+or
+
+%(prog)s --auto_map https://example.com/scripts/main.js -o ./output -v''')
 parser.add_argument('sourcemap', nargs='?', type=argparse.FileType('r'), default='-', help="Path to (local) sourcemap file. (defaults to stdin)")
 parser.add_argument('-a', '--auto_map', action='store', default=None, help="URL to the .js file to auto-map")
 parser.add_argument('-o', '--out_dir', action='store', default='./output', help="Directory to save extracted files")
