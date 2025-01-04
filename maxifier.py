@@ -22,10 +22,13 @@ parser.add_argument('-o', '--out_dir', action='store', default='./output', help=
 parser.add_argument('-v', '--verbose', action='store_true', help="Enable verbose output")
 args = parser.parse_args()
 
-verbose = args.verbose
-  
+if not args.sourcemap and not args.auto_map:
+    log("You must either provide a json sourcemap file, pipe one to stdin of this script, or provide a url to a js file as argument to --auto_map")
+    parser.print_help(sys.stderr)
+    sys.exit(1)
+
 def log(message):
-    if verbose:
+    if args.verbose:
         print(message)
 
 def resolve_sourcemap_url(js_url, sourcemap_path):
