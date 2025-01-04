@@ -9,7 +9,7 @@ When such a need arose for me, searching the obvious terms yielded only many, *m
 Recreate unminified source paths on disk from (json) .map file
 
 ### positional arguments:
-  `sourcemap`             Path to (local) sourcemap file. (defaults to stdin)
+  `sourcemap`             Path to (local) sourcemap file. (can be left off if a json map is being pioed/redirected to maxify's stdin.)
 
 ### options:
   `-h, --help`            show this help message and exit
