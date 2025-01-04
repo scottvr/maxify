@@ -1,7 +1,7 @@
 # maxify
 Maxify is a command-line tool that automates the unpacking and deminification of JavaScript projects from sourcemap files.
 
-Unlike generic beautifiers (such as the many, *many* online "paste javascript here" sites), Maxify recreates the original directory structure and unpacks all source files to their unminified, human-readable form - ideal for debugging, reverse engineering, or forensic analysis. 
+When such a need arose for me, searching the obvious terms yielded only many, *many* online "paste javascript here" BeautifyJS-type sites and nothing that would actually extract multiple files and write them to my disk. Maxify recreates the original directory structure of the minified/uglified js app and unpacks all source files to their unminified, human-readable form - ideal for debugging, reverse engineering, or forensic analysis. 
 
 ### usage: 
 `maxifier.py [-h] [-a AUTO_MAP] [-o OUT_DIR] [-v] [sourcemap]`
