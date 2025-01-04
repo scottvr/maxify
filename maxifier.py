@@ -61,8 +61,8 @@ def extract_sourcemap(js_content):
       return None, f"Failed to fetch sourcemap from URL {sourcemap_url}: {e}"
 
 if not args.sourcemap and not args.auto_map:
-    log("You must either provide a json sourcemap file, pipe one to stdin of this script, or provide a url to a js file as argument to --auto_map")
     parser.print_help(sys.stderr)
+    log("You must provide a json sourcemap file, pipe one to stdin of this script, or provide a url to a js file as argument to --auto_map as descrihbed above")
     sys.exit(1)
 
 if args.auto_map:
