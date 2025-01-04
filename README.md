@@ -15,7 +15,7 @@ Recreate unminified source paths on disk from (json) .map file
   `-h, --help`            show this help message and exit
   
   `-a AUTO_MAP, --auto_map AUTO_MAP`
-                        URL to the .js file to auto-map
+                        URL to the .js file to auto-map. Use this *or* a local `sourcemap`, but not both. 
                         
   `-o OUT_DIR, --out_dir OUT_DIR`
                         Directory to save extracted files
