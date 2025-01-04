@@ -22,11 +22,6 @@ parser.add_argument('-o', '--out_dir', action='store', default='./output', help=
 parser.add_argument('-v', '--verbose', action='store_true', help="Enable verbose output")
 args = parser.parse_args()
 
-if not args.sourcemap and not args.auto_map:
-    log("You must either provide a json sourcemap file, pipe one to stdin of this script, or provide a url to a js file as argument to --auto_map")
-    parser.print_help(sys.stderr)
-    sys.exit(1)
-
 def log(message):
     if args.verbose:
         print(message)
@@ -64,6 +59,11 @@ def extract_sourcemap(js_content):
         return response.json(), None
     except Exception as e:
       return None, f"Failed to fetch sourcemap from URL {sourcemap_url}: {e}"
+
+if not args.sourcemap and not args.auto_map:
+    log("You must either provide a json sourcemap file, pipe one to stdin of this script, or provide a url to a js file as argument to --auto_map")
+    parser.print_help(sys.stderr)
+    sys.exit(1)
 
 if args.auto_map:
     js_url = args.auto_map
