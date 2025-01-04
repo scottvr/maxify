@@ -88,7 +88,7 @@ if args.auto_map:
             log("Extracted Sourcemap:")
             log(json.dumps(sourcemap, indent=4))
 
-  if not sourcemap:
+if not sourcemap:
     # Fallback to local file
     sourcemap = json.load(args.sourcemap)
 
