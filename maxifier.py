@@ -39,7 +39,7 @@ def extract_sourcemap(js_content):
     match = re.search(pattern, js_content)
     
     if not match:
-        return None, "No sourceMappingURL found in the JavaScript file and no X-SourceMap header present.\nIf you have the sourcemap file, try running with that files as the sourcemap argument, without --auto_map"
+        return None, "Could not find a valid sourcemap reference (X-SourceMap header or //# sourceMappingURL) in the JavaScript file. Ensure the JavaScript file includes this information, or provide a sourcemap file directly."
     
     sourcemap_url = match.group(1)
 
@@ -59,7 +59,7 @@ def extract_sourcemap(js_content):
         response.raise_for_status()
         return response.json(), None
     except Exception as e:
-        return None, f"Failed to fetch sourcemap from URL: {e}"
+      return None, f"Failed to fetch sourcemap from URL {sourcemap_url}: {e}"
 
 sourcemap = None
 if args.auto_map:
@@ -96,12 +96,19 @@ if not sourcemap:
 out_dir = args.out_dir
 log(f"Extracting source files into: {out_dir}")
 os.makedirs(out_dir, exist_ok=True)
-
+if not os.access(out_dir, os.W_OK):
+    print(f"Error: Output directory '{out_dir}' is not writable. Exiting.")
+    exit(1)
+  
+if 'sourcesContent' not in sourcemap:
+    print("Error: The sourcemap does not contain 'sourcesContent'. Exiting.")
+    exit(1)
 # Extract sources from sourcemap
 for filename, content in zip(sourcemap['sources'], sourcemap['sourcesContent']):
     filename = os.path.normpath(filename)
-    while filename.startswith("../"):
-        filename = filename[3:]
+#    while filename.startswith("../"):
+#        filename = filename[3:]
+    filename = os.path.relpath(filename, start="/")
     file_path = os.path.join(out_dir, *filename.split('/'))
     
     log(f"Generating {file_path}..")
