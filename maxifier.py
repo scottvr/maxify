@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 def log(message):
     if args.verbose:
-        print(message)
+        print(message, file=sys.stderr)
 
 def resolve_sourcemap_url(js_url, sourcemap_path):
     if urlparse(sourcemap_path).scheme:  # Absolute URL
@@ -74,7 +74,7 @@ if args.auto_map:
         response.raise_for_status()
         js_content = response.text
     except requests.RequestException as e:
-        print(f"Error fetching JavaScript file: {e}")
+        print(f"Error fetching JavaScript file: {e}", file=sys.stderr)
         exit(1)
 
     # perhaps unlikely, but if it exists, give it priority (also, no need to request the js twice)
@@ -100,14 +100,14 @@ out_dir = args.out_dir
 log(f"Extracting source files into: {out_dir}")
 os.makedirs(out_dir, exist_ok=True)
 if not os.access(out_dir, os.W_OK):
-    print(f"Error: Output directory '{out_dir}' is not writable. Exiting.")
+    print(f"Error: Output directory '{out_dir}' is not writable. Exiting.", file=sys.stderr)
     exit(1)
   
 if 'sources' not in sourcemap:
-    print("Error: The sourcemap does not contain 'sources'. Exiting.")
+    print("Error: The sourcemap does not contain 'sources'. Exiting.", file=sys.stderr)
     exit(1)
 if 'sourcesContent' not in sourcemap:
-    print("Error: The sourcemap does not contain 'sourcesContent'. Exiting.")
+    print("Error: The sourcemap does not contain 'sourcesContent'. Exiting.", file=sys.stderr)
     exit(1)
 # Extract sources from sourcemap
 sourcemap['sources'] = [os.path.relpath(f, start="/") for f in sourcemap['sources']]
