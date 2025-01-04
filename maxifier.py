@@ -61,7 +61,6 @@ def extract_sourcemap(js_content):
     except Exception as e:
       return None, f"Failed to fetch sourcemap from URL {sourcemap_url}: {e}"
 
-sourcemap = None
 if args.auto_map:
     js_url = args.auto_map
     log(f"Retrieving JavaScript file from: {js_url}")
@@ -85,14 +84,14 @@ if args.auto_map:
         sourcemap, error = extract_sourcemap(js_content)
         if error:
             log(f"Error: {error}")
+            exit(1)
         else:
-            log("Extracted Sourcemap:")
-            log(json.dumps(sourcemap, indent=4))
-
-if not sourcemap:
+            log("Extracted Sourcemap.")
+else:
     # Fallback to local file
     sourcemap = json.load(args.sourcemap)
 
+log(json.dumps(sourcemap, indent=4))
 out_dir = args.out_dir
 log(f"Extracting source files into: {out_dir}")
 os.makedirs(out_dir, exist_ok=True)
@@ -100,15 +99,18 @@ if not os.access(out_dir, os.W_OK):
     print(f"Error: Output directory '{out_dir}' is not writable. Exiting.")
     exit(1)
   
+if 'sources' not in sourcemap:
+    print("Error: The sourcemap does not contain 'sources'. Exiting.")
+    exit(1)
 if 'sourcesContent' not in sourcemap:
     print("Error: The sourcemap does not contain 'sourcesContent'. Exiting.")
     exit(1)
 # Extract sources from sourcemap
+sourcemap['sources'] = [os.path.relpath(f, start="/") for f in sourcemap['sources']]
 for filename, content in zip(sourcemap['sources'], sourcemap['sourcesContent']):
     filename = os.path.normpath(filename)
 #    while filename.startswith("../"):
 #        filename = filename[3:]
-    filename = os.path.relpath(filename, start="/")
     file_path = os.path.join(out_dir, *filename.split('/'))
     
     log(f"Generating {file_path}..")
@@ -116,3 +118,4 @@ for filename, content in zip(sourcemap['sources'], sourcemap['sourcesContent']):
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(content or '')
     log("..done.")
+log(f"Extraction complete. Sources saved to: {out_dir}")
