@@ -10,7 +10,7 @@ from urllib.parse import urljoin, urlparse
 # Argument parser setup
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, 
                                  description="Recreate unminified source paths on disk from (json) .map file", 
-                                 usage="%(prog)s [-h] [-v] [[sourcemap] | [-a AUTO_MAP]] [-o OUT_DIR] 
+                                 usage="%(prog)s [-h] [-v] [[sourcemap] | [-a AUTO_MAP]] [-o OUT_DIR]",
                                  epilog='''Examples:
 %(prog)s path/to/source.js.map -o ./output_dir
 
