@@ -34,7 +34,7 @@ maxifier.py --auto_map https://example.com/scripts/main.js -o ./output -v
 ```
 
 ## Additional info:
-if passing a URL to a js file with --auto_map, maxify will check for a X-SourceMap HTTP header in the response to its request for the js URL and if the header is populated, will use the value for the .map file URL. If the HTTP header is not found or is empty, maxify will search the .js for a `//# sourceMapURL=` directive, and use the value for the URL to the .map file. 
+if passing a URL to a js file with --auto_map, maxify will check for a X-SourceMap HTTP header in the response to its request for the js URL and if the header is populated, will use the value for the .map file URL. If the HTTP header is not found or is empty, maxify will search the .js for a `//# sourceMappingURL=` directive, and use the value for the URL to the .map file. 
 
 If you already have a json .map file, maxify can read it directly.
 
